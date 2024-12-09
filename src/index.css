@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Effet d'illumination pour le texte */
+.glow-text {
+  color: #ff0000; /* Couleur principale rouge */
+  text-shadow: 
+    0 0 5px #ff0000, 
+    0 0 10px #ff0000, 
+    0 0 20px #ff0000, 
+    0 0 40px #ff0000, 
+    0 0 80px #ff0000;
+}
+
+/* Animation scintillante */
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-flicker {
+  animation: flicker 1.5s infinite;
+}
