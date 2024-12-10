@@ -1,0 +1,29 @@
+# Utiliser une image Python officielle
+FROM python:3.9
+
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Installer Bazel
+RUN apt-get update && apt-get install -y curl gnupg
+RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+RUN mv bazel-archive-keyring.gpg /usr/share/keyrings
+RUN echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
+RUN apt-get update && apt-get install -y apt-transport-https
+RUN apt-get update && apt-get install -y bazel
+RUN apt-get update && apt-get full-upgrade -y
+
+# Copier les fichiers requirements.txt
+COPY requirements.txt ./
+
+# Installer les dépendances
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copier le reste des fichiers de l'application
+COPY . .
+
+# Exposer le port de l'application
+EXPOSE 5001
+
+# Démarrer l'application
+CMD ["python", "encode.py"]
