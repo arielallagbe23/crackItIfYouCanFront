@@ -4,19 +4,18 @@ FROM python:3.9
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Installer Bazel
-RUN apt-get update && apt-get install -y curl gnupg
-RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-RUN mv bazel-archive-keyring.gpg /usr/share/keyrings
-RUN echo "deb [signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list
-RUN apt-get update && apt-get install -y bazel
-RUN apt-get update && apt-get full-upgrade -y
 
 # Copier les fichiers requirements.txt
 COPY requirements.txt ./
 
-# Installer les dépendances
+# Add these before your pip install command
+RUN apt-get update && apt-get install -y curl gnupg pkg-config zip g++ zlib1g-dev unzip python3 && \
+    curl -Lo /usr/local/bin/bazel https://github.com/bazelbuild/bazelisk/releases/download/v1.19.0/bazelisk-linux-amd64 && \
+    chmod +x /usr/local/bin/bazel
+    
+# Then your existing pip install
 RUN pip install --no-cache-dir -r requirements.txt
+
 
 # Copier le reste des fichiers de l'application
 COPY . .

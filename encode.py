@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify
 import tink
-from tink import aead
+from tink import daead
 from tink import cleartext_keyset_handle
 
 app = Flask(__name__)
 
-# Initialiser Tink
-aead.register()
+# Initialize Tink with DAEAD
+daead.register()
 
-# Clé AES-SIV fournie
+# AES-SIV key
 keyset_json = """{
   "primaryKeyId": 3225071859,
   "key": [{
@@ -23,18 +23,23 @@ keyset_json = """{
   }]
 }"""
 
+# Create the keyset handle using JsonKeysetReader
 keyset_handle = cleartext_keyset_handle.read(tink.JsonKeysetReader(keyset_json))
-aead_primitive = keyset_handle.primitive(aead.Aead)
+# Use DeterministicAead instead of Aead for AES-SIV
+daead_primitive = keyset_handle.primitive(daead.DeterministicAead)
 
 @app.route('/encode', methods=['POST'])
 def encode():
-    data = request.get_json()
-    hashed_password = data['hashed_password'].encode('utf-8')
+    try:
+        data = request.get_json()
+        hashed_password = data['hashed_password'].encode('utf-8')
 
-    # Encoder le hash avec AES-SIV
-    encoded_hash = aead_primitive.encrypt(hashed_password, b'')
+        # Encode the hash with AES-SIV using DeterministicAead
+        encoded_hash = daead_primitive.encrypt_deterministically(hashed_password, b'')
 
-    return jsonify({"encoded_hash": encoded_hash.hex()})
+        return jsonify({"encoded_hash": encoded_hash.hex()})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
