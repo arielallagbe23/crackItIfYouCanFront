@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.hash
     ports:
-      - "5001:5000"  # Change the host port to 5001
+      - "5001:5000"  
     volumes:
       - .:/app
     environment:
@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile.encode
     ports:
-      - "5002:5001"  # Change the host port to 5002
+      - "5002:5000"  
     volumes:
       - .:/app
     environment:
