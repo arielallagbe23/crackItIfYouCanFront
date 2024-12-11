@@ -38,14 +38,14 @@ def index():
 def encode():
     try:
         data = request.get_json()
+        print("Received data:", data)  # Debug print
         hashed_password = data['hashed_password'].encode('utf-8')
-
-        # Encode the hash with AES-SIV using DeterministicAead
         encoded_hash = daead_primitive.encrypt_deterministically(hashed_password, b'')
-
-        return jsonify({"encoded_hash": encoded_hash.hex()})
+        result = encoded_hash.hex()
+        print("Encoded result:", result)  # Debug print
+        return jsonify({"encoded_hash": result})
     except Exception as e:
+        print("Error:", str(e))  # Debug print
         return jsonify({"error": str(e)}), 400
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)  # Run the server
